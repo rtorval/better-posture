@@ -45,25 +45,17 @@ jobs:
           go install github.com/tc-hib/go-winres@latest
           echo "$(go env GOPATH)/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-          go-winres make
-          go build -ldflags="-H=windowsgui" -o "${{ steps.vars.outputs.exe }}" .
+          Set-Location $env:GITHUB_WORKSPACE
 
+          go-winres make
+
+          Write-Host "Building ${{ steps.vars.outputs.exe }}..."
+          go build -ldflags="-H=windowsgui" -o "${{ steps.vars.outputs.exe }}" .
       - name: Generate SHA-256 checksum
         shell: pwsh
         run: |
           $hash = Get-FileHash "${{ steps.vars.outputs.exe }}" -Algorithm SHA256
           "$($hash.Hash)  ${{ steps.vars.outputs.exe }}" | Out-File "${{ steps.vars.outputs.sum }}" -Encoding utf8
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-        with:
-          tag_name: ${{ steps.vars.outputs.tag }}
-          release_name: ${{ steps.vars.outputs.tag }}
-          draft: false
-          prerelease: false
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
