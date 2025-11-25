@@ -1,0 +1,58 @@
+{
+  "RT_GROUP_ICON": {
+    "APP": {
+      "0000": "../assets/icon.ico"
+    }
+  },
+  "RT_MANIFEST": {
+    "#1": {
+      "0409": {
+        "identity": {
+          "name": "BetterPosture.App",
+          "version": "1.0.0.0"
+        },
+        "description": "A lightweight system tray utility for posture reminders.",
+        "minimum-os": "win7",
+        "execution-level": "as invoker",
+        "ui-access": false,
+        "auto-elevate": false,
+        "dpi-awareness": "system",
+        "disable-theming": false,
+        "disable-window-filtering": false,
+        "high-resolution-scrolling-aware": false,
+        "ultra-high-resolution-scrolling-aware": false,
+        "long-path-aware": false,
+        "printer-driver-isolation": false,
+        "gdi-scaling": true,
+        "segment-heap": false,
+        "use-common-controls-v6": true
+      }
+    }
+  },
+  "RT_VERSION": {
+    "#1": {
+      "0000": {
+        "fixed": {
+          "file_version": "1.0.0.0",
+          "product_version": "1.0.0.0"
+        },
+        "info": {
+          "0409": {
+            "Comments": "A posture reminder utility to promote ergonomic habits.",
+            "CompanyName": "Rodrigo Toraño Valle",
+            "FileDescription": "Better Posture - A Posture Reminder Utility",
+            "FileVersion": "1.0.0.0",
+            "InternalName": "BetterPosture",
+            "LegalCopyright": "Copyright (C) 2025",
+            "LegalTrademarks": "",
+            "OriginalFilename": "BetterPosture.exe",
+            "PrivateBuild": "",
+            "ProductName": "Better Posture",
+            "ProductVersion": "1.0.0.0",
+            "SpecialBuild": ""
+          }
+        }
+      }
+    }
+  }
+}
