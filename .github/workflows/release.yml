@@ -11,19 +11,15 @@ permissions:
 
 jobs:
   build-release:
-    name: Build and Release for Windows
+    name: Build and Release
     runs-on: windows-latest
 
     env:
       APP_NAME: better-posture
       GO_VERSION: "1.25.4"
-      GIT_AUTHOR_NAME: "rtorval"
-      GIT_AUTHOR_EMAIL: "github@users.noreply.github.com"
-      GIT_COMMITTER_NAME: "rtorval"
-      GIT_COMMITTER_EMAIL: "github@users.noreply.github.com"
 
     steps:
-      - name: Check out code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Go
@@ -31,7 +27,7 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
 
-      - name: Set version variables
+      - name: Compute variables
         id: vars
         shell: pwsh
         run: |
@@ -39,32 +35,52 @@ jobs:
           $EXE_NAME = "${{ env.APP_NAME }}-$TAG.exe"
           $SUM_NAME = "$EXE_NAME.sha256"
 
-          echo "TAG=$TAG" >> $env:GITHUB_ENV
-          echo "EXE_NAME=$EXE_NAME" >> $env:GITHUB_ENV
-          echo "SUM_NAME=$SUM_NAME" >> $env:GITHUB_ENV
+          echo "tag=$TAG" >> $env:GITHUB_OUTPUT
+          echo "exe=$EXE_NAME" >> $env:GITHUB_OUTPUT
+          echo "sum=$SUM_NAME" >> $env:GITHUB_OUTPUT
 
       - name: Install go-winres and build exe
         shell: pwsh
         run: |
           go install github.com/tc-hib/go-winres@latest
-          echo "$(go env GOPATH)/bin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
+          echo "$(go env GOPATH)/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
           go-winres make
-          go build -ldflags="-H=windowsgui" -o $env:EXE_NAME .
+          go build -ldflags="-H=windowsgui" -o "${{ steps.vars.outputs.exe }}" .
 
       - name: Generate SHA-256 checksum
         shell: pwsh
         run: |
-          $hash = Get-FileHash $env:EXE_NAME -Algorithm SHA256
-          "$($hash.Hash)  $($env:EXE_NAME)" | Out-File $env:SUM_NAME -Encoding utf8
+          $hash = Get-FileHash "${{ steps.vars.outputs.exe }}" -Algorithm SHA256
+          "$($hash.Hash)  ${{ steps.vars.outputs.exe }}" | Out-File "${{ steps.vars.outputs.sum }}" -Encoding utf8
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.TAG }}
-          name: ${{ env.TAG }}
-          files: |
-            ${{ env.EXE_NAME }}
-            ${{ env.SUM_NAME }}
-          generate_release_notes: true
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.vars.outputs.tag }}
+          release_name: ${{ steps.vars.outputs.tag }}
+          draft: false
+          prerelease: false
+
+      - name: Upload EXE
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.vars.outputs.exe }}
+          asset_name: ${{ steps.vars.outputs.exe }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload SHA256
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.vars.outputs.sum }}
+          asset_name: ${{ steps.vars.outputs.sum }}
+          asset_content_type: text/plain
