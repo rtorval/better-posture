@@ -37,25 +37,34 @@ jobs:
         run: |
           $TAG = "${{ github.ref_name }}"
           $EXE_NAME = "${{ env.APP_NAME }}-$TAG.exe"
+          $SUM_NAME = "$EXE_NAME.sha256"
+
           echo "TAG=$TAG" >> $env:GITHUB_ENV
           echo "EXE_NAME=$EXE_NAME" >> $env:GITHUB_ENV
+          echo "SUM_NAME=$SUM_NAME" >> $env:GITHUB_ENV
 
       - name: Install go-winres and build exe
         shell: pwsh
         run: |
           go install github.com/tc-hib/go-winres@latest
-          echo "$(go env GOPATH)/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "$(go env GOPATH)/bin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
           go-winres make
           go build -ldflags="-H=windowsgui" -o $env:EXE_NAME .
+
+      - name: Generate SHA-256 checksum
+        shell: pwsh
+        run: |
+          $hash = Get-FileHash $env:EXE_NAME -Algorithm SHA256
+          "$($hash.Hash)  $($env:EXE_NAME)" | Out-File $env:SUM_NAME -Encoding utf8
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.TAG }}
           name: ${{ env.TAG }}
-          files: ${{ env.EXE_NAME }}
-          draft: false
-          prerelease: false
+          files: |
+            ${{ env.EXE_NAME }}
+            ${{ env.SUM_NAME }}
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
