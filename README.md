@@ -1,8 +1,16 @@
 # Better Posture ✨
 
+![Release](https://img.shields.io/github/v/release/rtorval/better-posture)
+![License](https://img.shields.io/github/license/rtorval/better-posture)
+![Stars](https://img.shields.io/github/stars/rtorval/better-posture)
+![Go](https://img.shields.io/github/go-mod/go-version/rtorval/better-posture)
+
+
 _`A posture reminder utility to promote ergonomic habits.`_
 
-Better Posture is a lightweight and robust Windows system-tray utility that helps you maintain better posture and take regular breaks. Never forget to stretch or adjust your position again!
+🪑 **Better Posture** is a lightweight and robust Windows system-tray utility that helps you maintain better posture and take regular breaks. Never forget to stretch or adjust your position again!
+
+![Better Posture Screenshot](assets/screenshot-main.png)
 
 **Better Posture automatically adapts its interface to your system language.** 
 
@@ -82,6 +90,25 @@ Notes:
 * `system_language` only reflects the language detected from your Windows system.
 * Changing the system language or deleting the config will update the default reminder title and messag e automatically.
 * Manual edits are possible while the app is closed.
+
+## 📅 Roadmap
+
+Planned enhancements:
+
+- Cross-platform support (macOS/Linux)  
+- Localization support for more languages
+
+
+## 🤝 Contributing
+
+Thanks for your interest in Better Posture! Contributions are welcome.  
+
+1. Fork the repo  
+2. Create a feature branch  
+3. Commit your changes  
+4. Open a pull request
+
+*`Please follow the existing code style and keep it simple, clean and readable.`*
 
 ## 💻 Technical Details
 
