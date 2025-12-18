@@ -17,8 +17,8 @@ _`A posture reminder utility to promote ergonomic habits.`_
 
 ## 💡 Features
 
-* **Lightweight and Minimal:** As a native Go application that consumes minimal CPU and memory resources.
-* **Non-Blocking Notifications:** Uses native Windows notifications (`MessageBoxW` + `toast`) in a non-blocking way, so the app remains responsive even while a message is visible.
+* **Lightweight and Minimal:** Native Go application that consumes minimal CPU and memory resources.
+* **Non-Blocking Notifications:** Uses native Windows notifications (`MessageBoxW` + Windows toast notifications) in a non-blocking way.
 * **Live Countdown Timer:** Displays the time remaining until the next reminder directly in the system tray tooltip and the menu itself.
 * **Customizable Intervals:** Easily increase, decrease, or reset the reminder interval directly from the tray menu (from 1 minute up to 24 hours).
 * **Pause & Resume:** You can pause and resume the reminders at any time.
@@ -88,15 +88,15 @@ Example:
 ```
 Notes:
 * `system_language` only reflects the language detected from your Windows system.
-* Changing the system language or deleting the config will update the default reminder title and messag e automatically.
+* Changing the system language or deleting the config will update the default reminder title and message automatically.
 * Manual edits are possible while the app is closed.
 
 ## 📅 Roadmap
 
 Planned enhancements:
 
-- Cross-platform support (macOS/Linux)  
-- Localization support for more languages
+- Potential cross-platform support (macOS/Linux)
+- Expanded localization support
 
 
 ## 🤝 Contributing
