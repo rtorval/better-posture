@@ -9,7 +9,7 @@
       "0409": {
         "identity": {
           "name": "BetterPosture.App",
-          "version": "1.0.0.0"
+          "version": "1.1.0.0"
         },
         "description": "A lightweight system tray utility for posture reminders.",
         "minimum-os": "win7",
@@ -33,22 +33,22 @@
     "#1": {
       "0000": {
         "fixed": {
-          "file_version": "1.0.0.0",
-          "product_version": "1.0.0.0"
+          "file_version": "1.1.0.0",
+          "product_version": "1.1.0.0"
         },
         "info": {
           "0409": {
             "Comments": "A posture reminder utility to promote ergonomic habits.",
             "CompanyName": "Rodrigo Toraño Valle",
             "FileDescription": "Better Posture - A Posture Reminder Utility",
-            "FileVersion": "1.0.0.0",
+            "FileVersion": "1.1.0.0",
             "InternalName": "BetterPosture",
             "LegalCopyright": "Copyright (C) 2025",
             "LegalTrademarks": "",
             "OriginalFilename": "BetterPosture.exe",
             "PrivateBuild": "",
             "ProductName": "Better Posture",
-            "ProductVersion": "1.0.0.0",
+            "ProductVersion": "1.1.0.0",
             "SpecialBuild": ""
           }
         }

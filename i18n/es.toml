@@ -1,0 +1,38 @@
+ReminderTitle = "Recordatorio de postura"
+ReminderMessage = "¡Es hora de revisar tu postura!"
+AboutTitle = "Acerca de Better Posture"
+
+MenuAbout = "Acerca de Better Posture"
+MenuIncrease1h = "Aumentar (+1 hora)"
+MenuDecrease1h = "Disminuir (-1 hora)"
+MenuIncrease30m = "Aumentar (+30 min)"
+MenuDecrease30m = "Disminuir (-30 min)"
+MenuIncrease5m = "Aumentar (+5 min)"
+MenuDecrease5m = "Disminuir (-5 min)"
+MenuIncrease1m = "Aumentar (+1 min)"
+MenuDecrease1m = "Disminuir (-1 min)"
+MenuResetDefault = "Restablecer intervalo (%d min)"
+MenuQuit = "Salir"
+
+TrayBaseTooltip = "✨Siéntate bien. Muévete a menudo. Siéntete mejor."
+CountdownLabel = "Cuenta atrás: %s"
+IntervalLabel = "Intervalo: %s"
+
+ReminderDefaultTitle = "Recordatorio de postura"
+ReminderDefaultMessage = "Es hora de corregir tu postura."
+
+AboutHeader = "Better Posture - Una app de notificaciones para promover hábitos ergonómicos.\n\n"
+AboutCopyright = "Copyright (C) 2025  Rodrigo Toraño Valle\n\n"
+AboutLicense_notice = """
+Este programa es software libre: puede redistribuirlo y/o modificarlo bajo los términos de la Licencia General Pública de GNU publicada por la Free Software Foundation, ya sea la versión 3 de la Licencia, o (a su elección) cualquier versión posterior.
+
+Este programa se distribuye con la esperanza de que sea útil pero SIN NINGUNA GARANTÍA; incluso sin la garantía implícita de MERCANTIBILIDAD o APTITUD PARA UN PROPÓSITO PARTICULAR. Vea la Licencia General Pública de GNU para más detalles.
+
+Usted ha debido recibir una copia de la Licencia General Pública de GNU junto con este programa. Si no, vea <http://www.gnu.org/licenses/>.
+
+Puede encontrar el texto completo de la licencia GPLv3 en:
+"""
+
+AboutThird_party_notice = """
+Los avisos necesarios para los componentes de terceros que utilizan licencias Apache-2.0 y BSD-3-Clause se encuentran en la siguiente carpeta:
+"""

@@ -1,0 +1,37 @@
+ReminderTitle = "Posture Reminder"
+ReminderMessage = "Time to check your posture!"
+AboutTitle = "About Better Posture"
+MenuAbout = "About Better Posture"
+MenuIncrease1h = "Increase (+1 hour)"
+MenuDecrease1h = "Decrease (-1 hour)"
+MenuIncrease30m = "Increase (+30 min)"
+MenuDecrease30m = "Decrease (-30 min)"
+MenuIncrease5m = "Increase (+5 min)"
+MenuDecrease5m = "Decrease (-5 min)"
+MenuIncrease1m = "Increase (+1 min)"
+MenuDecrease1m = "Decrease (-1 min)"
+MenuResetDefault = "Reset interval (%d min)"
+MenuQuit = "Quit"
+TrayBaseTooltip = "✨Sit smart. Move often. Feel better."
+CountdownLabel = "Countdown: %s"
+IntervalLabel = "Interval: %s"
+
+ReminderDefaultTitle = "Posture Reminder"
+ReminderDefaultMessage = "It's time to correct your posture."
+
+
+AboutHeader = "Better Posture - A posture reminder utility to promote ergonomic habits.\n\n"
+AboutCopyright = "Copyright (C) 2025  Rodrigo Toraño Valle\n\n"
+AboutLicense_notice = """
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+You can find the full text of the GPLv3 license at:
+"""
+
+AboutThird_party_notice = """
+The notices required for third-party components licensed under Apache-2.0 and BSD-3-Clause are located in the following folder:
+"""

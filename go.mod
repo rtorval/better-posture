@@ -1,11 +1,13 @@
-module better_posture
+module better-posture
 
 go 1.25.4
 
 require (
+	github.com/BurntSushi/toml v1.5.0
 	github.com/getlantern/systray v1.2.2
 	github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4
 	golang.org/x/sys v0.38.0
+	golang.org/x/text v0.31.0
 )
 
 require (

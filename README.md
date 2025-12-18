@@ -4,6 +4,8 @@ _`A posture reminder utility to promote ergonomic habits.`_
 
 Better Posture is a lightweight and robust Windows system-tray utility that helps you maintain better posture and take regular breaks. Never forget to stretch or adjust your position again!
 
+**Better Posture automatically adapts its interface to your system language.** 
+
 
 ## 💡 Features
 
@@ -15,6 +17,7 @@ Better Posture is a lightweight and robust Windows system-tray utility that help
 * **Persistent Configuration:** Stores your settings in %APPDATA%/BetterPosture/settings.json.
 * **Resilient & Safe:** Automatically recovers from missing/corrupted settings files and sanitizes invalid values.
 * **Single-Instance Enforcement:** Prevents multiple copies from running at once.
+* **System-Language Aware:** Automatically translates its interface based on your Windows system language.
 
 
 ## 🛠️ Installation & Usage
@@ -70,10 +73,14 @@ Example:
 {
     "interval_minutes": 3,
     "reminder_title": "Time to Move!",
-    "reminder_message": "Stand up, stretch your back, and adjust your chair."
+    "reminder_message": "Stand up, stretch your back, and adjust your chair.",
+    "system_language": "en-US"
 }
 ```
-You can edit this file manually while the application is closed.
+Notes:
+* `system_language` only reflects the language detected from your Windows system.
+* Changing the system language or deleting the config will update the default reminder title and messag e automatically.
+* Manual edits are possible while the app is closed.
 
 ## 💻 Technical Details
 
@@ -90,6 +97,9 @@ Better Posture is built entirely in Go and uses:
 
 * go-winres — embeds icons and metadata into the Windows executable
     [github.com/tc-hib/go-winres](https://github.com/tc-hib/go-winres)
+
+* BurntSushi/toml — TOML parser for Golang
+    [github.com/BurntSushi/toml](https://github.com/BurntSushi/toml)
 
 
 ## ⚖️ License

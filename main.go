@@ -36,6 +36,8 @@ import (
 
 	"github.com/getlantern/systray"
 	"github.com/go-toast/toast"
+
+	"better-posture/i18n"
 )
 
 //go:embed assets/icon.ico
@@ -48,9 +50,7 @@ var licenseData []byte
 var thirdPartyLicenses embed.FS
 
 const (
-	defaultInterval        = 3 // minutes
-	defaultReminderTitle   = "Posture Reminder"
-	defaultReminderMessage = "Time to check your posture!"
+	defaultInterval = 3 // minutes
 
 	minInterval = 1       // minutes
 	maxInterval = 24 * 60 // 1440 minutes (24 hours)
@@ -72,6 +72,7 @@ type Config struct {
 	IntervalMinutes int    `json:"interval_minutes"`
 	ReminderTitle   string `json:"reminder_title"`
 	ReminderMessage string `json:"reminder_message"`
+	SystemLanguage  string `json:"system_language"`
 }
 
 func settingsPath() string {
@@ -185,10 +186,12 @@ func ensureResourceFiles() {
 }
 
 func loadConfig() Config {
+	t := i18n.Printer()
 	defaultCfg := Config{
 		IntervalMinutes: defaultInterval,
-		ReminderTitle:   defaultReminderTitle,
-		ReminderMessage: defaultReminderMessage,
+		ReminderTitle:   t.Sprintf("ReminderDefaultTitle"),
+		ReminderMessage: t.Sprintf("ReminderDefaultMessage"),
+		SystemLanguage:  i18n.DetectUserLanguage(),
 	}
 
 	p := settingsPath()
@@ -211,6 +214,13 @@ func loadConfig() Config {
 
 	needsSave := false
 
+	if cfg.SystemLanguage == "" || cfg.SystemLanguage != defaultCfg.SystemLanguage {
+		cfg.SystemLanguage = defaultCfg.SystemLanguage
+		cfg.ReminderTitle = defaultCfg.ReminderTitle
+		cfg.ReminderMessage = defaultCfg.ReminderMessage
+		needsSave = true
+	}
+
 	if cfg.IntervalMinutes < minInterval {
 		cfg.IntervalMinutes = minInterval
 		needsSave = true
@@ -222,12 +232,12 @@ func loadConfig() Config {
 	}
 
 	if cfg.ReminderTitle == "" {
-		cfg.ReminderTitle = defaultReminderTitle
+		cfg.ReminderTitle = defaultCfg.ReminderTitle
 		needsSave = true
 	}
 
 	if cfg.ReminderMessage == "" {
-		cfg.ReminderMessage = defaultReminderMessage
+		cfg.ReminderMessage = defaultCfg.ReminderMessage
 		needsSave = true
 	}
 
@@ -286,19 +296,17 @@ func showAbout() {
 	mainLicensePath := licenseFilePath()
 	thirdPartyLicensesDir := filepath.Join(filepath.Dir(settingsPath()), "THIRD_PARTY_LICENSES")
 
+	p := i18n.Printer()
+
 	aboutMessage := fmt.Sprintf(
-		"Better Posture - A posture reminder utility to promote ergonomic habits.\n\n"+
-			"Copyright (C) 2025  Rodrigo Toraño Valle\n\n"+
-			"This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n\n"+
-			"This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\n"+
-			"You should have received a copy of the GNU General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.\n\n"+
-			"You can find the full GPLv3 license text in:\n%s\n\n"+
-			"Required notices for third-party components (Apache-2.0, BSD-3-Clause) are located in the following folder:\n%s\n\n\n\n",
-		mainLicensePath,
-		thirdPartyLicensesDir,
+		"%s%s%s%s\n\n\n\n",
+		p.Sprintf("AboutHeader"),
+		p.Sprintf("AboutCopyright"),
+		p.Sprintf("AboutLicense_notice")+mainLicensePath+"\n\n",
+		p.Sprintf("AboutThird_party_notice")+thirdPartyLicensesDir,
 	)
 
-	t, _ := windows.UTF16PtrFromString("About Better Posture")
+	t, _ := windows.UTF16PtrFromString(p.Sprintf("AboutTitle"))
 	m, _ := windows.UTF16PtrFromString(aboutMessage)
 
 	procMessageBoxW.Call(0,
@@ -352,36 +360,39 @@ func main() {
 }
 
 func onReady() {
+	p := i18n.Printer()
+
 	ensureResourceFiles()
 
 	systray.SetIcon(iconData)
 	systray.SetTitle("Better Posture")
 
-	const baseTooltip = "✨Sit smart. Move often. Feel better."
+	baseTooltip := p.Sprintf("TrayBaseTooltip")
 	systray.SetTooltip(baseTooltip)
 
 	cfg := loadConfig()
 
-	mInfo := systray.AddMenuItem("About Better Posture", "Show application and licensing information")
+	mInfo := systray.AddMenuItem(p.Sprintf("MenuAbout"), "")
 	systray.AddSeparator()
 	intervalDuration := time.Duration(cfg.IntervalMinutes) * time.Minute
-	mIntervalLabel := systray.AddMenuItem(fmt.Sprintf("Interval: %s", formatDuration(intervalDuration)), "")
+	mIntervalLabel := systray.AddMenuItem(p.Sprintf("IntervalLabel", formatDuration(intervalDuration)), "")
 	mIntervalLabel.Disable()
-	mCountdown := systray.AddMenuItem("Countdown:", "")
+	mCountdown := systray.AddMenuItem(p.Sprintf("CountdownLabel", ""), "")
 	mCountdown.Disable()
 	systray.AddSeparator()
-	mPlus1h := systray.AddMenuItem("Increase (+1 hour)", "")
-	mMinus1h := systray.AddMenuItem("Decrease (-1 hour)", "")
-	mPlus30m := systray.AddMenuItem("Increase (+30 min)", "")
-	mMinus30m := systray.AddMenuItem("Decrease (-30 min)", "")
-	mPlus5m := systray.AddMenuItem("Increase (+5 min)", "")
-	mMinus5m := systray.AddMenuItem("Decrease (-5 min)", "")
-	mPlus1m := systray.AddMenuItem("Increase (+1 min)", "")
-	mMinus1m := systray.AddMenuItem("Decrease (-1 min)", "")
+	mPlus1h := systray.AddMenuItem(p.Sprintf("MenuIncrease1h"), "")
+	mMinus1h := systray.AddMenuItem(p.Sprintf("MenuDecrease1h"), "")
+	mPlus30m := systray.AddMenuItem(p.Sprintf("MenuIncrease30m"), "")
+	mMinus30m := systray.AddMenuItem(p.Sprintf("MenuDecrease30m"), "")
+	mPlus5m := systray.AddMenuItem(p.Sprintf("MenuIncrease5m"), "")
+	mMinus5m := systray.AddMenuItem(p.Sprintf("MenuDecrease5m"), "")
+	mPlus1m := systray.AddMenuItem(p.Sprintf("MenuIncrease1m"), "")
+	mMinus1m := systray.AddMenuItem(p.Sprintf("MenuDecrease1m"), "")
 	systray.AddSeparator()
-	mResetDefault := systray.AddMenuItem(fmt.Sprintf("Reset interval (%d min)", defaultInterval), "")
+	mResetDefault := systray.AddMenuItem(p.Sprintf("MenuResetDefault", defaultInterval), "")
+	mPause := systray.AddMenuItem(p.Sprintf("MenuPause"), "")
 	systray.AddSeparator()
-	mQuit := systray.AddMenuItem("Quit", "Exit program")
+	mQuit := systray.AddMenuItem(p.Sprintf("MenuQuit"), "")
 
 	var lastTriggeredUnix int64
 	atomic.StoreInt64(&lastTriggeredUnix, time.Now().UnixNano())
@@ -406,7 +417,7 @@ func onReady() {
 		}
 
 		d := time.Duration(cfg.IntervalMinutes) * time.Minute
-		mIntervalLabel.SetTitle(fmt.Sprintf("Interval: %s", formatDuration(d)))
+		mIntervalLabel.SetTitle(p.Sprintf("IntervalLabel", formatDuration(d)))
 	}
 
 	go func() {
@@ -417,7 +428,7 @@ func onReady() {
 			case <-ticker.C:
 				if isMessageShowing.Load() {
 					systray.SetTooltip(baseTooltip)
-					mCountdown.SetTitle("Countdown:")
+					mCountdown.SetTitle(p.Sprintf("CountdownLabel", ""))
 				} else {
 					cfgMutex.RLock()
 					intervalMinutes := cfg.IntervalMinutes
@@ -429,11 +440,11 @@ func onReady() {
 
 					if remaining <= 0 {
 						systray.SetTooltip(baseTooltip)
-						mCountdown.SetTitle("Countdown:")
+						mCountdown.SetTitle(p.Sprintf("CountdownLabel", ""))
 					} else {
 						countdown := formatDuration(remaining)
 						systray.SetTooltip(fmt.Sprintf("%s (%s)", baseTooltip, countdown))
-						mCountdown.SetTitle(fmt.Sprintf("Countdown: %s", countdown))
+						mCountdown.SetTitle(p.Sprintf("CountdownLabel", countdown))
 					}
 				}
 
