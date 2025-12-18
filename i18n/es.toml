@@ -12,6 +12,8 @@ MenuDecrease5m = "Disminuir (-5 min)"
 MenuIncrease1m = "Aumentar (+1 min)"
 MenuDecrease1m = "Disminuir (-1 min)"
 MenuResetDefault = "Restablecer intervalo (%d min)"
+MenuPause = "Pausar"
+MenuResume = "Reanudar"
 MenuQuit = "Salir"
 
 TrayBaseTooltip = "✨Siéntate bien. Muévete a menudo. Siéntete mejor."

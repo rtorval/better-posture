@@ -13,6 +13,7 @@ Better Posture is a lightweight and robust Windows system-tray utility that help
 * **Non-Blocking Notifications:** Uses native Windows notifications (`MessageBoxW` + `toast`) in a non-blocking way, so the app remains responsive even while a message is visible.
 * **Live Countdown Timer:** Displays the time remaining until the next reminder directly in the system tray tooltip and the menu itself.
 * **Customizable Intervals:** Easily increase, decrease, or reset the reminder interval directly from the tray menu (from 1 minute up to 24 hours).
+* **Pause & Resume:** You can pause and resume the reminders at any time.
 * **Portable:** The application is a single executable file with no external dependencies.
 * **Persistent Configuration:** Stores your settings in %APPDATA%/BetterPosture/settings.json.
 * **Resilient & Safe:** Automatically recovers from missing/corrupted settings files and sanitizes invalid values.

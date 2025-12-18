@@ -68,6 +68,15 @@ var (
 	procMessageBoxW = user32.NewProc("MessageBoxW")
 )
 
+var isMessageShowing atomic.Bool
+
+var isPaused atomic.Bool
+var pausedLastTriggered int64
+var pausedAt int64
+
+var instanceMutex windows.Handle
+var cfgMutex sync.RWMutex
+
 type Config struct {
 	IntervalMinutes int    `json:"interval_minutes"`
 	ReminderTitle   string `json:"reminder_title"`
@@ -319,9 +328,6 @@ func showAbout() {
 	// }()
 }
 
-var instanceMutex windows.Handle
-var cfgMutex sync.RWMutex
-
 func enforceSingleInstance() bool {
 	const mutexName = "Global\\BetterPostureMutex"
 	h, err := windows.CreateMutex(nil, false, windows.StringToUTF16Ptr(mutexName))
@@ -338,6 +344,9 @@ func enforceSingleInstance() bool {
 }
 
 func formatDuration(d time.Duration) string {
+	if d < 0 {
+		d = 0
+	}
 	d = d.Round(time.Second)
 
 	totalSeconds := int(d.Seconds())
@@ -397,8 +406,6 @@ func onReady() {
 	var lastTriggeredUnix int64
 	atomic.StoreInt64(&lastTriggeredUnix, time.Now().UnixNano())
 
-	var isMessageShowing atomic.Bool
-
 	updateInterval := func(newInterval int) {
 		if newInterval < minInterval {
 			newInterval = minInterval
@@ -426,50 +433,71 @@ func onReady() {
 		for {
 			select {
 			case <-ticker.C:
-				if isMessageShowing.Load() {
-					systray.SetTooltip(baseTooltip)
-					mCountdown.SetTitle(p.Sprintf("CountdownLabel", ""))
-				} else {
-					cfgMutex.RLock()
-					intervalMinutes := cfg.IntervalMinutes
-					cfgMutex.RUnlock()
-
-					last := time.Unix(0, atomic.LoadInt64(&lastTriggeredUnix))
-					nextTrigger := last.Add(time.Duration(intervalMinutes) * time.Minute)
-					remaining := time.Until(nextTrigger)
-
-					if remaining <= 0 {
-						systray.SetTooltip(baseTooltip)
-						mCountdown.SetTitle(p.Sprintf("CountdownLabel", ""))
-					} else {
-						countdown := formatDuration(remaining)
-						systray.SetTooltip(fmt.Sprintf("%s (%s)", baseTooltip, countdown))
-						mCountdown.SetTitle(p.Sprintf("CountdownLabel", countdown))
-					}
-				}
-
-				last := time.Unix(0, atomic.LoadInt64(&lastTriggeredUnix))
-
 				cfgMutex.RLock()
 				intervalMinutes := cfg.IntervalMinutes
 				cfgMutex.RUnlock()
+				interval := time.Duration(intervalMinutes) * time.Minute
+				var remaining time.Duration
 
-				if time.Since(last) >= time.Duration(intervalMinutes)*time.Minute && !isMessageShowing.Load() {
-					isMessageShowing.Store(true)
+				if isPaused.Load() {
+					lastTriggered := time.Unix(0, atomic.LoadInt64(&pausedLastTriggered))
+					pauseStart := time.Unix(0, atomic.LoadInt64(&pausedAt))
+					remaining = lastTriggered.Add(interval).Sub(pauseStart)
+					countdown := formatDuration(remaining)
+					systray.SetTooltip(fmt.Sprintf("%s (%s)", baseTooltip, countdown))
+					mCountdown.SetTitle(p.Sprintf("CountdownLabel", countdown))
+				} else if !isMessageShowing.Load() {
+					last := time.Unix(0, atomic.LoadInt64(&lastTriggeredUnix))
+					remaining = interval - time.Since(last)
+					countdown := formatDuration(remaining)
+					systray.SetTooltip(fmt.Sprintf("%s (%s)", baseTooltip, countdown))
+					mCountdown.SetTitle(p.Sprintf("CountdownLabel", countdown))
 
-					cfgMutex.RLock()
-					title := cfg.ReminderTitle
-					message := cfg.ReminderMessage
-					cfgMutex.RUnlock()
-
-					go func(tit, msg string) {
-						err := showToast(tit, msg)
-						if err != nil {
-							showMessage(tit, msg)
+					if remaining <= 0 {
+						cfgMutex.RLock()
+						title := cfg.ReminderTitle
+						if title == "" {
+							title = p.Sprintf("ReminderTitle")
 						}
-						isMessageShowing.Store(false)
-						atomic.StoreInt64(&lastTriggeredUnix, time.Now().UnixNano())
-					}(title, message)
+						message := cfg.ReminderMessage
+						if message == "" {
+							message = p.Sprintf("ReminderMessage")
+						}
+						cfgMutex.RUnlock()
+
+						go func(tit, msg string) {
+							isMessageShowing.Store(true)
+							err := showToast(tit, msg)
+							if err != nil {
+								showMessage(tit, msg)
+							}
+							isMessageShowing.Store(false)
+							atomic.StoreInt64(&lastTriggeredUnix, time.Now().UnixNano())
+							atomic.StoreInt64(&pausedLastTriggered, time.Now().UnixNano())
+							atomic.StoreInt64(&pausedAt, time.Now().UnixNano())
+						}(title, message)
+					}
+				}
+
+			case <-mPause.ClickedCh:
+				if isPaused.Load() {
+					// RESUME
+					lastTriggered := time.Unix(0, atomic.LoadInt64(&pausedLastTriggered))
+					pauseStart := time.Unix(0, atomic.LoadInt64(&pausedAt))
+					elapsedBeforePause := pauseStart.Sub(lastTriggered)
+					newLast := time.Now().Add(-elapsedBeforePause)
+					atomic.StoreInt64(&lastTriggeredUnix, newLast.UnixNano())
+
+					isPaused.Store(false)
+					mPause.SetTitle(p.Sprintf("MenuPause"))
+				} else {
+					// PAUSE
+					last := time.Unix(0, atomic.LoadInt64(&lastTriggeredUnix))
+					atomic.StoreInt64(&pausedLastTriggered, last.UnixNano())
+					atomic.StoreInt64(&pausedAt, time.Now().UnixNano())
+
+					isPaused.Store(true)
+					mPause.SetTitle(p.Sprintf("MenuResume"))
 				}
 
 			case <-mPlus1m.ClickedCh:
